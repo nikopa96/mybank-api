@@ -1,0 +1,98 @@
+openapi: 3.1.1
+info:
+  title: MyBank public API
+  description: |-
+    List of all public endpoints and request/response models for MyBank
+    This documentation was generated using OpenAPI and a YAML file.
+    Based on this documentation, the backend project will automatically generate all the necessary classes.
+  version: 1.0.0
+externalDocs:
+  description: Open API specification
+  url: https://swagger.io/docs/specification/v3_0/about/
+servers:
+  - url: http://localhost:8080/
+tags:
+  - name: AccountController
+    description: Bank accounts related endpoints
+paths:
+  /account/balances/total:
+    post:
+      tags:
+        - AccountController
+      summary: Get total from all balances of the bank account in a given currency
+      description: Get total from all balances of the bank account in a given currency
+      operationId: getBankAccountTotal
+      requestBody:
+        description: Search criteria
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BankAccountTotalRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BankAccountTotalResponse'
+        '422':
+          description: Validation exception
+components:
+  schemas:
+    CurrencyCode:
+      type: string
+      enum:
+        - EUR
+        - USD
+        - SEK
+        - RUB
+    BankAccount:
+      type: object
+      properties:
+        iban:
+          type: string
+          example: 'EE251298943438713614'
+        holderName:
+          type: string
+          example: 'ADAM SMITH'
+    BankAccountBalance:
+      type: object
+      properties:
+        currencyCode:
+          $ref: '#/components/schemas/CurrencyCode'
+          example: 'EUR'
+        balance:
+          type: number
+          format: double
+          example: 1234.56
+    BankAccountTotal:
+      type: object
+      properties:
+        currencyCode:
+          $ref: '#/components/schemas/CurrencyCode'
+          example: 'EUR'
+        balance:
+          type: number
+          format: double
+          example: 1234.56
+    BankAccountTotalRequest:
+      type: object
+      properties:
+        iban:
+          type: string
+          example: 'EE251298943438713614'
+        currencyCode:
+          $ref: '#/components/schemas/CurrencyCode'
+          example: 'EUR'
+    BankAccountTotalResponse:
+      type: object
+      properties:
+        account:
+          $ref: '#/components/schemas/BankAccount'
+        balances:
+          type: array
+          items:
+            $ref: '#/components/schemas/BankAccountBalance'
+        total:
+          $ref: '#/components/schemas/BankAccountTotal'
