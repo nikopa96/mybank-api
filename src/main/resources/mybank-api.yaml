@@ -1,4 +1,4 @@
-openapi: 3.1.1
+openapi: 3.0.4
 info:
   title: MyBank public API
   description: |-
@@ -12,15 +12,15 @@ externalDocs:
 servers:
   - url: http://localhost:8080/
 tags:
-  - name: AccountController
+  - name: Account
     description: Bank accounts related endpoints
-  - name: TransactionController
+  - name: Transaction
     description: Bank transaction related endpoints
 paths:
-  /account/balances/total:
+  /accounts/balances/total:
     post:
       tags:
-        - AccountController
+        - Account
       summary: Get total of all balances of the bank account in a given currency
       description: Get total of all balances of the bank account in a given currency
       operationId: getBankAccountTotal
@@ -38,12 +38,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BankAccountTotalResponse'
+        '400':
+          description: Bad request
         '422':
-          description: Validation exception
-  /transaction/deposit:
+          description: Unprocessable entity
+  /transactions/deposit:
     post:
       tags:
-        - TransactionController
+        - Transaction
       summary: Depositing money into an account for a specific currency
       description: Depositing money into an account for a specific currency
       operationId: depositMoneyToBankAccount
@@ -62,23 +64,15 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TransactionResponseSuccess'
+                $ref: '#/components/schemas/TransactionResponse'
         '400':
-          description: Invalid input
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TransactionResponseFail'
+          description: Bad request
         '422':
-          description: Validation exception
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TransactionResponseFail'
-  /transaction/debit:
+          description: Unprocessable entity
+  /transactions/debit:
     post:
       tags:
-        - TransactionController
+        - Transaction
       summary: Debiting money from an account in a single currency
       description: Debiting money from an account in a single currency
       operationId: debitMoneyFromBankAccount
@@ -97,19 +91,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TransactionResponseSuccess'
+                $ref: '#/components/schemas/TransactionResponse'
         '400':
-          description: Invalid input
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TransactionResponseFail'
+          description: Bad request
         '422':
-          description: Validation exception
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TransactionResponseFail'
+          description: Unprocessable entity
 components:
   schemas:
     CurrencyCode:
@@ -143,7 +129,6 @@ components:
       properties:
         currencyCode:
           $ref: '#/components/schemas/CurrencyCode'
-          example: 'EUR'
         balance:
           type: number
           format: double
@@ -153,7 +138,6 @@ components:
       properties:
         currencyCode:
           $ref: '#/components/schemas/CurrencyCode'
-          example: 'EUR'
         balance:
           type: number
           format: double
@@ -166,7 +150,9 @@ components:
           example: 'EE251298943438713614'
         currencyCode:
           $ref: '#/components/schemas/CurrencyCode'
-          example: 'EUR'
+      required:
+        - iban
+        - currencyCode
     BankAccountTotalResponse:
       type: object
       properties:
@@ -194,24 +180,15 @@ components:
         currencyCode:
           $ref: '#/components/schemas/CurrencyCode'
           example: 'EUR'
-    TransactionResponseSuccess:
+      required:
+        - iban
+        - holderName
+        - amount
+        - currencyCode
+    TransactionResponse:
       type: object
       properties:
         type:
           $ref: '#/components/schemas/TransactionType'
-        request:
-          $ref: '#/components/schemas/TransactionRequest'
         response:
           $ref: '#/components/schemas/ResponseResult'
-    TransactionResponseFail:
-      type: object
-      properties:
-        type:
-          $ref: '#/components/schemas/TransactionType'
-        request:
-          $ref: '#/components/schemas/TransactionRequest'
-        response:
-          $ref: '#/components/schemas/ResponseResult'
-        responseDescription:
-          type: string
-          example: 'There is no holder with such IBAN'

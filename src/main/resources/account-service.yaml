@@ -1,0 +1,136 @@
+openapi: 3.0.4
+info:
+  title: AccountService API
+  description: |-
+    List of all internal endpoints in the AccountService
+    This documentation was generated using OpenAPI and a YAML file.
+    Based on this documentation, the backend project will automatically generate all the necessary classes.
+  version: 1.0.0
+externalDocs:
+  description: Open API specification
+  url: https://swagger.io/docs/specification/v3_0/about/
+servers:
+  - url: http://localhost:8080/
+tags:
+  - name: Account
+    description: Bank accounts related endpoints
+paths:
+  /account/{iban}/balance/{currencyCode}:
+    get:
+      tags:
+        - Account
+      summary: Internal endpoint. Find a balance of the bank account by currency code
+      description: Internal endpoint. Find a balance of the bank account by currency code
+      operationId: getBankAccountBalanceByCurrency
+      parameters:
+        - name: iban
+          in: path
+          description: IBAN of the bank account
+          required: true
+          schema:
+            type: string
+        - name: currencyCode
+          in: path
+          description: Currency code
+          required: true
+          schema:
+            $ref: '#/components/schemas/CurrencyCode'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BankAccountResponse'
+        '404':
+          description: Not found
+  /accounts/balances/total:
+    post:
+      tags:
+        - Account
+      summary: Get total of all balances of the bank account in a given currency
+      description: Get total of all balances of the bank account in a given currency
+      operationId: getBankAccountTotal
+      requestBody:
+        description: Search criteria
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BankAccountTotalRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BankAccountTotalResponse'
+        '400':
+          description: Bad request
+        '422':
+          description: Unprocessable entity
+components:
+  schemas:
+    CurrencyCode:
+      type: string
+      enum:
+        - EUR
+        - USD
+        - SEK
+        - RUB
+    BankAccount:
+      type: object
+      properties:
+        iban:
+          type: string
+          example: 'EE251298943438713614'
+        holderName:
+          type: string
+          example: 'ADAM SMITH'
+    BankAccountBalance:
+      type: object
+      properties:
+        currencyCode:
+          $ref: '#/components/schemas/CurrencyCode'
+        balance:
+          type: number
+          format: double
+          example: 1234.56
+    BankAccountResponse:
+      type: object
+      properties:
+        account:
+          $ref: '#/components/schemas/BankAccount'
+        balance:
+          $ref: '#/components/schemas/BankAccountBalance'
+    BankAccountTotal:
+      type: object
+      properties:
+        currencyCode:
+          $ref: '#/components/schemas/CurrencyCode'
+        balance:
+          type: number
+          format: double
+          example: 1234.56
+    BankAccountTotalRequest:
+      type: object
+      properties:
+        iban:
+          type: string
+          example: 'EE251298943438713614'
+        currencyCode:
+          $ref: '#/components/schemas/CurrencyCode'
+      required:
+        - iban
+        - currencyCode
+    BankAccountTotalResponse:
+      type: object
+      properties:
+        account:
+          $ref: '#/components/schemas/BankAccount'
+        balances:
+          type: array
+          items:
+            $ref: '#/components/schemas/BankAccountBalance'
+        total:
+          $ref: '#/components/schemas/BankAccountTotal'
