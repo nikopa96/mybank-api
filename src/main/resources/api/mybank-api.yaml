@@ -114,6 +114,42 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FailedTransactionResponse'
+  /transactions/onlinepayment:
+    post:
+      tags:
+        - Transaction
+      summary: Online payment from an account in a single currency
+      description: This method debits money from the account and sends a callback to the payment terminal server.
+      operationId: makeOnlinePayment
+      requestBody:
+        description: |-
+          It is necessary to specify the holder of account and iban, as well as the amount of money to be debited in 
+          a specific currency. Callback URL required.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OnlinePaymentRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OnlinePaymentResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                nullable: true
+        '422':
+          description: Unprocessable entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FailedOnlinePaymentResponse'
 components:
   schemas:
     CurrencyCode:
@@ -133,6 +169,12 @@ components:
       enum:
         - NOT_ENOUGH_MONEY
         - ACCOUNT_BALANCE_NOT_FOUND
+    FailedOnlinePaymentReason:
+      type: string
+      enum:
+        - NOT_ENOUGH_MONEY
+        - ACCOUNT_BALANCE_NOT_FOUND
+        - NO_RESPONSE_FROM_PAYMENT_GATEWAY_SERVER
     Account:
       type: object
       properties:
@@ -224,3 +266,30 @@ components:
           example: false
         failureReason:
           $ref: '#/components/schemas/FailedTransactionReason'
+    OnlinePaymentRequest:
+      type: object
+      properties:
+        transactionInfo:
+          $ref: '#/components/schemas/TransactionRequest'
+        callbackURL:
+          type: string
+          example: uri
+      required:
+        - transactionInfo
+        - callbackURL
+    OnlinePaymentResponse:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/TransactionType'
+        success:
+          type: boolean
+          example: true
+    FailedOnlinePaymentResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        failureReason:
+          $ref: '#/components/schemas/FailedOnlinePaymentReason'

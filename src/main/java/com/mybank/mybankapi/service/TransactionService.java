@@ -1,10 +1,13 @@
 package com.mybank.mybankapi.service;
 
+import com.mybank.api.model.OnlinePaymentRequestApiModel;
+import com.mybank.api.model.OnlinePaymentResponseApiModel;
 import com.mybank.api.model.TransactionRequestApiModel;
 import com.mybank.api.model.TransactionResponseApiModel;
 import com.mybank.mybankapi.integration.accountservice.AccountServiceClient;
 import com.mybank.mybankapi.integration.transactionservice.TransactionServiceClient;
 import com.mybank.mybankapi.mapper.ResponseMapper;
+import com.mybank.transactionservice.model.OnlinePaymentRequest;
 import com.mybank.transactionservice.model.TransactionRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,6 +30,19 @@ public class TransactionService {
     public TransactionResponseApiModel depositMoneyToBankAccount(TransactionRequestApiModel request) {
         var depositClientRequest = createClientRequest(request);
         var depositClientResponse = transactionServiceClient.depositMoneyToBankAccount(depositClientRequest);
+
+        return responseMapper.toApiModel(depositClientResponse);
+    }
+
+    public OnlinePaymentResponseApiModel makeOnlinePayment(OnlinePaymentRequestApiModel request) {
+        var transactionInfo = createClientRequest(request.getTransactionInfo());
+
+        var depositClientRequest = OnlinePaymentRequest.builder()
+                .transactionInfo(transactionInfo)
+                .callbackURL(request.getCallbackURL())
+                .build();
+
+        var depositClientResponse = transactionServiceClient.makeOnlinePayment(depositClientRequest);
 
         return responseMapper.toApiModel(depositClientResponse);
     }

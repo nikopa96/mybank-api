@@ -3,6 +3,8 @@ package com.mybank.mybankapi.integration.transactionservice;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mybank.mybankapi.exception.ClientIntegrationException;
 import com.mybank.mybankapi.integration.RestClientService;
+import com.mybank.transactionservice.model.OnlinePaymentRequest;
+import com.mybank.transactionservice.model.OnlinePaymentResponse;
 import com.mybank.transactionservice.model.TransactionRequest;
 import com.mybank.transactionservice.model.TransactionResponse;
 import lombok.RequiredArgsConstructor;
@@ -50,6 +52,21 @@ public class TransactionServiceClient {
         validateResponseStatusCode(response, errorMessage);
 
         return objectMapper.convertValue(response.getBody(), TransactionResponse.class);
+    }
+
+    public OnlinePaymentResponse makeOnlinePayment(OnlinePaymentRequest request) {
+        var response = restClientService.post(
+                transactionServiceUrl,
+                TransactionServiceConstants.METHOD_MAKE_ONLINE_PAYMENT,
+                request,
+                new ParameterizedTypeReference<>() {}
+        );
+
+        String errorMessage = String.format("Unable to deposit money to an bank_account_balance: %s",
+                request.getTransactionInfo().getBankAccountBalanceUuid());
+        validateResponseStatusCode(response, errorMessage);
+
+        return objectMapper.convertValue(response.getBody(), OnlinePaymentResponse.class);
     }
 
     private static void validateResponseStatusCode(ResponseEntity<Object> response, String errorMessage) {
