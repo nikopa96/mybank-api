@@ -19,9 +19,9 @@ paths:
     get:
       tags:
         - Account
-      summary: Internal endpoint. Find a balance of the bank account by currency code
-      description: Internal endpoint. Find a balance of the bank account by currency code
-      operationId: getBankAccountBalanceByCurrency
+      summary: Internal endpoint. Find properties of the account balance by IBAN and currency code
+      description: Internal endpoint. Find properties of the account balance by IBAN and currency code
+      operationId: getAccountBalanceProperties
       parameters:
         - name: iban
           in: path
@@ -41,9 +41,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BankAccountResponse'
+                $ref: '#/components/schemas/AccountBalanceProperties'
         '404':
           description: Not found
+          content:
+            application/json:
+              schema:
+                type: object
+                nullable: true
   /accounts/balances/total:
     post:
       tags:
@@ -56,7 +61,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BankAccountTotalRequest'
+              $ref: '#/components/schemas/AccountTotalRequest'
         required: true
       responses:
         '200':
@@ -64,11 +69,21 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BankAccountTotalResponse'
+                $ref: '#/components/schemas/AccountTotalResponse'
         '400':
           description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                nullable: true
         '422':
           description: Unprocessable entity
+          content:
+            application/json:
+              schema:
+                type: object
+                nullable: true
 components:
   schemas:
     CurrencyCode:
@@ -78,7 +93,7 @@ components:
         - USD
         - SEK
         - RUB
-    BankAccount:
+    Account:
       type: object
       properties:
         iban:
@@ -87,7 +102,7 @@ components:
         holderName:
           type: string
           example: 'ADAM SMITH'
-    BankAccountBalance:
+    AccountBalance:
       type: object
       properties:
         currencyCode:
@@ -96,23 +111,28 @@ components:
           type: number
           format: double
           example: 1234.56
-    BankAccountResponse:
+        convertedBalanceCurrencyCode:
+          $ref: '#/components/schemas/CurrencyCode'
+        convertedBalance:
+          type: number
+          format: double
+          example: 1234.56
+    AccountBalanceProperties:
       type: object
       properties:
-        account:
-          $ref: '#/components/schemas/BankAccount'
-        balance:
-          $ref: '#/components/schemas/BankAccountBalance'
-    BankAccountTotal:
+        bankAccountBalanceUuid:
+          type: string
+          format: uuid
+    AccountTotal:
       type: object
       properties:
         currencyCode:
           $ref: '#/components/schemas/CurrencyCode'
-        balance:
+        balanceTotal:
           type: number
           format: double
           example: 1234.56
-    BankAccountTotalRequest:
+    AccountTotalRequest:
       type: object
       properties:
         iban:
@@ -123,14 +143,14 @@ components:
       required:
         - iban
         - currencyCode
-    BankAccountTotalResponse:
+    AccountTotalResponse:
       type: object
       properties:
         account:
-          $ref: '#/components/schemas/BankAccount'
+          $ref: '#/components/schemas/Account'
         balances:
           type: array
           items:
-            $ref: '#/components/schemas/BankAccountBalance'
+            $ref: '#/components/schemas/AccountBalance'
         total:
-          $ref: '#/components/schemas/BankAccountTotal'
+          $ref: '#/components/schemas/AccountTotal'

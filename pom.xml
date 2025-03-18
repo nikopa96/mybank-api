@@ -82,6 +82,11 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.wiremock.integrations</groupId>
+            <artifactId>wiremock-spring-boot</artifactId>
+            <version>3.6.0</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -129,7 +134,7 @@
                         </goals>
                         <configuration>
                             <inputSpec>
-                                ${project.basedir}/src/main/resources/mybank-api.yaml
+                                ${project.basedir}/src/main/resources/api/mybank-api.yaml
                             </inputSpec>
                             <generatorName>spring</generatorName>
                             <output>${project.basedir}/target/generated-sources</output>
@@ -137,6 +142,7 @@
                             <modelPackage>com.mybank.api.model</modelPackage>
                             <generateSupportingFiles>false</generateSupportingFiles>
                             <generateApis>true</generateApis>
+                            <modelNameSuffix>ApiModel</modelNameSuffix>
                             <configOptions>
                                 <generateBuilders>true</generateBuilders>
                                 <delegatePatterns>false</delegatePatterns>
@@ -155,7 +161,7 @@
                         </goals>
                         <configuration>
                             <inputSpec>
-                                ${project.basedir}/src/main/resources/account-service.yaml
+                                ${project.basedir}/src/main/resources/api/account-service.yaml
                             </inputSpec>
                             <generatorName>spring</generatorName>
                             <output>${project.basedir}/target/generated-sources</output>

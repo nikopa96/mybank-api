@@ -29,7 +29,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BankAccountTotalRequest'
+              $ref: '#/components/schemas/AccountTotalRequest'
         required: true
       responses:
         '200':
@@ -37,7 +37,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BankAccountTotalResponse'
+                $ref: '#/components/schemas/AccountTotalResponse'
         '400':
           description: Bad request
         '422':
@@ -67,8 +67,17 @@ paths:
                 $ref: '#/components/schemas/TransactionResponse'
         '400':
           description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                nullable: true
         '422':
           description: Unprocessable entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FailedTransactionResponse'
   /transactions/debit:
     post:
       tags:
@@ -94,8 +103,17 @@ paths:
                 $ref: '#/components/schemas/TransactionResponse'
         '400':
           description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                nullable: true
         '422':
           description: Unprocessable entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FailedTransactionResponse'
 components:
   schemas:
     CurrencyCode:
@@ -110,12 +128,12 @@ components:
       enum:
         - DEPOSIT
         - DEBIT
-    ResponseResult:
+    FailedTransactionReason:
       type: string
       enum:
-        - SUCCESS
-        - FAIL
-    BankAccount:
+        - NOT_ENOUGH_MONEY
+        - ACCOUNT_BALANCE_NOT_FOUND
+    Account:
       type: object
       properties:
         iban:
@@ -124,7 +142,7 @@ components:
         holderName:
           type: string
           example: 'ADAM SMITH'
-    BankAccountBalance:
+    AccountBalance:
       type: object
       properties:
         currencyCode:
@@ -133,16 +151,22 @@ components:
           type: number
           format: double
           example: 1234.56
-    BankAccountTotal:
+        convertedBalanceCurrencyCode:
+          $ref: '#/components/schemas/CurrencyCode'
+        convertedBalance:
+          type: number
+          format: double
+          example: 1234.56
+    AccountTotal:
       type: object
       properties:
         currencyCode:
           $ref: '#/components/schemas/CurrencyCode'
-        balance:
+        balanceTotal:
           type: number
           format: double
           example: 1234.56
-    BankAccountTotalRequest:
+    AccountTotalRequest:
       type: object
       properties:
         iban:
@@ -153,17 +177,17 @@ components:
       required:
         - iban
         - currencyCode
-    BankAccountTotalResponse:
+    AccountTotalResponse:
       type: object
       properties:
         account:
-          $ref: '#/components/schemas/BankAccount'
+          $ref: '#/components/schemas/Account'
         balances:
           type: array
           items:
-            $ref: '#/components/schemas/BankAccountBalance'
+            $ref: '#/components/schemas/AccountBalance'
         total:
-          $ref: '#/components/schemas/BankAccountTotal'
+          $ref: '#/components/schemas/AccountTotal'
     TransactionRequest:
       type: object
       properties:
@@ -179,7 +203,6 @@ components:
           example: 1234.56
         currencyCode:
           $ref: '#/components/schemas/CurrencyCode'
-          example: 'EUR'
       required:
         - iban
         - holderName
@@ -190,5 +213,14 @@ components:
       properties:
         type:
           $ref: '#/components/schemas/TransactionType'
-        response:
-          $ref: '#/components/schemas/ResponseResult'
+        success:
+          type: boolean
+          example: true
+    FailedTransactionResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        failureReason:
+          $ref: '#/components/schemas/FailedTransactionReason'
