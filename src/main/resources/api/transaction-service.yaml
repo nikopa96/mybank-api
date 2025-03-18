@@ -1,0 +1,137 @@
+openapi: 3.0.4
+info:
+  title: TransactionService API
+  description: |-
+    List of all internal endpoints in the TransactionService
+    This documentation was generated using OpenAPI and a YAML file.
+    Based on this documentation, the backend project will automatically generate all the necessary classes.
+  version: 1.0.0
+externalDocs:
+  description: Open API specification
+  url: https://swagger.io/docs/specification/v3_0/about/
+servers:
+  - url: http://localhost:8080/
+tags:
+  - name: TransactionController
+    description: Bank transaction related endpoints
+paths:
+  /transactions/deposit:
+    post:
+      tags:
+        - Transaction
+      summary: Depositing money into an account for a specific currency
+      description: Depositing money into an account for a specific currency
+      operationId: depositMoneyToBankAccount
+      requestBody:
+        description: |-
+          It is necessary to specify the holder of account and iban, as well as the amount of money to be deposited 
+          in a specific currency
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                nullable: true
+        '422':
+          description: Unprocessable entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FailedTransactionResponse'
+  /transactions/debit:
+    post:
+      tags:
+        - Transaction
+      summary: Debiting money from an account in a single currency
+      description: Debiting money from an account in a single currency
+      operationId: debitMoneyFromBankAccount
+      requestBody:
+        description: |-
+          It is necessary to specify the holder of account and iban, as well as the amount of money to be debited in 
+          a specific currency
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                nullable: true
+        '422':
+          description: Unprocessable entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FailedTransactionResponse'
+components:
+  schemas:
+    CurrencyCode:
+      type: string
+      enum:
+        - EUR
+        - USD
+        - SEK
+        - RUB
+    TransactionType:
+      type: string
+      enum:
+        - DEPOSIT
+        - DEBIT
+    FailedTransactionReason:
+      type: string
+      enum:
+        - NOT_ENOUGH_MONEY
+        - ACCOUNT_BALANCE_NOT_FOUND
+    TransactionRequest:
+      type: object
+      properties:
+        bankAccountBalanceUuid:
+          type: string
+          format: uuid
+        amount:
+          type: number
+          format: double
+          example: 1234.56
+      required:
+        - bankAccountBalanceUuid
+        - amount
+    TransactionResponse:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/TransactionType'
+        success:
+          type: boolean
+          example: true
+    FailedTransactionResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        failureReason:
+          $ref: '#/components/schemas/FailedTransactionReason'

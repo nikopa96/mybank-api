@@ -10,6 +10,7 @@ import com.mybank.mybankapi.integration.RestClientService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -36,7 +37,7 @@ public class AccountServiceClient {
         );
 
         validateResponseStatusCode(response);
-        return (AccountBalanceProperties) response.getBody();
+        return objectMapper.convertValue(response.getBody(), AccountBalanceProperties.class);
     }
 
     public AccountTotalResponse getBankAccountTotal(String iban, String currency) {
@@ -55,7 +56,10 @@ public class AccountServiceClient {
 
     private static void validateResponseStatusCode(ResponseEntity<Object> response) {
         if (!response.getStatusCode().is2xxSuccessful()) {
-            throw new ClientIntegrationException("Unable to get response. Status: " + response.getStatusCode());
+            HttpStatus httpStatus = HttpStatus.valueOf(response.getStatusCode().value());
+            String message = "Unable to get response. Status: " + response.getStatusCode();
+
+            throw new ClientIntegrationException(message, httpStatus);
         }
     }
 }
