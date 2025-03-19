@@ -3,6 +3,7 @@ package com.mybank.mybankapi.service;
 import com.mybank.accountservice.model.AccountTotalResponse;
 import com.mybank.api.model.AccountTotalRequestApiModel;
 import com.mybank.api.model.AccountTotalResponseApiModel;
+import com.mybank.mybankapi.exception.BankAccountNotFoundException;
 import com.mybank.mybankapi.exception.AccountServiceClientException;
 import com.mybank.mybankapi.integration.accountservice.AccountServiceClient;
 import com.mybank.mybankapi.mapper.ResponseMapper;
@@ -26,7 +27,7 @@ public class AccountService {
             return responseMapper.toApiModel(clientResponse);
         } catch (AccountServiceClientException e) {
             log.error("Account not found by IBAN: {}", request.getIban());
-            throw new IllegalArgumentException();
+            throw new BankAccountNotFoundException();
         }
     }
 }

@@ -2,6 +2,7 @@ package com.mybank.mybankapi.handler;
 
 import com.mybank.api.model.FailedOnlinePaymentResponseApiModel;
 import com.mybank.api.model.FailedTransactionResponseApiModel;
+import com.mybank.mybankapi.exception.BankAccountNotFoundException;
 import com.mybank.mybankapi.exception.OnlinePaymentException;
 import com.mybank.mybankapi.exception.TransactionException;
 import com.mybank.mybankapi.mapper.ResponseMapper;
@@ -18,9 +19,14 @@ public class ControllerExceptionHandler {
 
     private final ResponseMapper responseMapper;
 
-    @ExceptionHandler({MethodArgumentNotValidException.class, IllegalArgumentException.class})
+    @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Void> handleMethodArgumentNotValidException() {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(BankAccountNotFoundException.class)
+    public ResponseEntity<Void> handleBankAccountNotFoundException() {
+        return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     @ExceptionHandler(TransactionException.class)

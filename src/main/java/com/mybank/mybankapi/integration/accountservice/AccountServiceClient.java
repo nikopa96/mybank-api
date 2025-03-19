@@ -11,8 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpStatusCodeException;
 
 import java.util.Map;
 
@@ -29,35 +29,32 @@ public class AccountServiceClient {
     public AccountBalanceProperties getAccountBalanceProperties(String iban, String currency) {
         var uriVariables = Map.of("iban", iban, "currencyCode", currency);
 
-        var response = restClientService.get(
-                accountServiceUrl,
-                AccountServiceConstants.URL_GET_ACCOUNT_BALANCE_BY_CURRENCY,
-                uriVariables,
-                new ParameterizedTypeReference<>() {}
-        );
-
-        validateResponseStatusCode(response);
-        return objectMapper.convertValue(response.getBody(), AccountBalanceProperties.class);
+        try {
+            var response = restClientService.get(
+                    accountServiceUrl,
+                    AccountServiceConstants.URL_GET_ACCOUNT_BALANCE_BY_CURRENCY,
+                    uriVariables,
+                    new ParameterizedTypeReference<>() {}
+            );
+            return objectMapper.convertValue(response.getBody(), AccountBalanceProperties.class);
+        } catch (HttpStatusCodeException e) {
+            throw new AccountServiceClientException(HttpStatus.valueOf(e.getStatusCode().value()));
+        }
     }
 
     public AccountTotalResponse getBankAccountTotal(String iban, String currency) {
         var request = new AccountTotalRequest(iban, CurrencyCode.valueOf(currency));
 
-        var response = restClientService.post(
-                accountServiceUrl,
-                AccountServiceConstants.URL_GET_ACCOUNT_TOTAL,
-                request,
-                new ParameterizedTypeReference<>() {}
-        );
-
-        validateResponseStatusCode(response);
-        return objectMapper.convertValue(response.getBody(), AccountTotalResponse.class);
-    }
-
-    private static void validateResponseStatusCode(ResponseEntity<Object> response) {
-        if (response.getStatusCode().is4xxClientError()) {
-            HttpStatus httpStatus = HttpStatus.valueOf(response.getStatusCode().value());
-            throw new AccountServiceClientException(httpStatus);
+        try {
+            var response = restClientService.post(
+                    accountServiceUrl,
+                    AccountServiceConstants.URL_GET_ACCOUNT_TOTAL,
+                    request,
+                    new ParameterizedTypeReference<>() {}
+            );
+            return objectMapper.convertValue(response.getBody(), AccountTotalResponse.class);
+        } catch (HttpStatusCodeException e) {
+            throw new AccountServiceClientException(HttpStatus.valueOf(e.getStatusCode().value()));
         }
     }
 }
