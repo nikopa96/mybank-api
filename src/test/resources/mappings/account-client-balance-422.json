@@ -1,0 +1,9 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/account/EE251298943438713615/balance/RUB"
+  },
+  "response": {
+    "status": 404
+  }
+}

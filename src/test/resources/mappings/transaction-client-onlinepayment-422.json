@@ -1,0 +1,18 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "/transactions/onlinepayment",
+    "bodyPatterns" : [
+      {
+        "equalToJson" : "{\"transactionInfo\":{\"bankAccountBalanceUuid\":\"1751f904-0496-472a-ab5f-a45b01c4e8ec\",\"amount\":1000.00},\"callbackURL\":\"https://httpstat.us/200\"}"
+      }
+    ]
+  },
+  "response": {
+    "status": 422,
+    "bodyFileName": "transaction-onlinepayment-422.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

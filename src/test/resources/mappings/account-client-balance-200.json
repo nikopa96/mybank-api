@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/account/EE251298943438713614/balance/USD"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "account-client-balance-200.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "/transactions/debit",
+    "bodyPatterns" : [
+      {
+        "equalToJson" : "{\"bankAccountBalanceUuid\": \"1751f904-0496-472a-ab5f-a45b01c4e8ec\", \"amount\": 689.56}"
+      }
+    ]
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "transaction-debit-200.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

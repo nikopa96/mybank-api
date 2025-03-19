@@ -1,0 +1,18 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "/transactions/deposit",
+    "bodyPatterns" : [
+      {
+        "equalToJson" : "{\"bankAccountBalanceUuid\": \"1751f904-0496-472a-ab5f-a45b01c4e8ec\", \"amount\": 1234000.56}"
+      }
+    ]
+  },
+  "response": {
+    "status": 422,
+    "bodyFileName": "transaction-deposit-422.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}
