@@ -32,7 +32,7 @@ public class AccountServiceClient {
         try {
             var response = restClientService.get(
                     accountServiceUrl,
-                    AccountServiceConstants.URL_GET_ACCOUNT_BALANCE_BY_CURRENCY,
+                    AccountServiceConstants.METHOD_GET_ACCOUNT_PROPERTIES,
                     uriVariables,
                     new ParameterizedTypeReference<>() {}
             );
@@ -48,7 +48,7 @@ public class AccountServiceClient {
         try {
             var response = restClientService.post(
                     accountServiceUrl,
-                    AccountServiceConstants.URL_GET_ACCOUNT_TOTAL,
+                    AccountServiceConstants.METHOD_GET_ACCOUNT_TOTAL,
                     request,
                     new ParameterizedTypeReference<>() {}
             );
