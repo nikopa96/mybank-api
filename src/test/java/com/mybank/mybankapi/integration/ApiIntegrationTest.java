@@ -125,6 +125,28 @@ public class ApiIntegrationTest {
     }
 
     @Test
+    void testDepositMoneyToBankAccount_status422_accountNotFoundCase() throws IOException, JSONException {
+        String expectedResult = readString("transaction-deposit-422.json");
+
+        TransactionRequestApiModel request = TransactionRequestApiModel
+                .builder()
+                .iban("EE251298943438713615")
+                .holderName("ADAM SMITH")
+                .amount(1234.56)
+                .currencyCode(CurrencyCodeApiModel.RUB)
+                .build();
+
+        var response = given().contentType(ContentType.JSON)
+                .body(request)
+                .when()
+                .post("/transactions/deposit");
+
+        var actualBody = response.body();
+
+        JSONAssert.assertEquals(expectedResult, actualBody.asString(), JSONCompareMode.LENIENT);
+    }
+
+    @Test
     void testDepositMoneyToBankAccount_status400() {
         // negative amount
         TransactionRequestApiModel request = TransactionRequestApiModel
