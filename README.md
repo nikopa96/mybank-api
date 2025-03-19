@@ -31,6 +31,15 @@ Instructions on how to run this project are provided below.
 
 **AccountService** and **TransactionService** do not communicate with each other. They only send an intermediate response to **MyBankAPI**.
 
+## Database
+The database of the project consists of 3 tables: Bank accounts, related Bank account balances, and Exchange rates
+
+We store money in cents using BigInteger datatype. This prevents rounding inaccuracies.
+
+The Exchange rates table has a base_currency column. This column is necessary because we use the base currency as an intermediate currency for conversion. This is the approach used by payment systems such as Visa and MasterCard. But we use BigDecimal because in this case, BigInteger gives a big error in conversion.
+
+![Database schema](mybank_database_schema.png)
+
 ## Running a project on a local machine
 Clone the following projects to your local machine:
 - [mybank-api](https://github.com/nikopa96/mybank-api)
