@@ -8,8 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpStatusCodeException;
 
 @Service
 @RequiredArgsConstructor
@@ -22,62 +22,56 @@ public class TransactionServiceClient {
     private String transactionServiceUrl;
 
     public TransactionResponse debitMoneyFromBankAccount(TransactionRequest request) {
-        var response = restClientService.post(
-                transactionServiceUrl,
-                TransactionServiceConstants.METHOD_DEBIT_MONEY,
-                request,
-                new ParameterizedTypeReference<>() {}
-        );
-
-        validateTransactionResponseStatusCode(response);
-        return objectMapper.convertValue(response.getBody(), TransactionResponse.class);
+        try {
+            var response = restClientService.post(
+                    transactionServiceUrl,
+                    TransactionServiceConstants.METHOD_DEBIT_MONEY,
+                    request,
+                    new ParameterizedTypeReference<>() {}
+            );
+            return objectMapper.convertValue(response.getBody(), TransactionResponse.class);
+        } catch (HttpStatusCodeException e) {
+            throw handleHttpStatusCodeException(e, FailedTransactionResponse.class);
+        }
     }
 
     public TransactionResponse depositMoneyToBankAccount(TransactionRequest request) {
-        var response = restClientService.post(
-                transactionServiceUrl,
-                TransactionServiceConstants.METHOD_DEPOSIT_MONEY,
-                request,
-                new ParameterizedTypeReference<>() {}
-        );
-
-        validateTransactionResponseStatusCode(response);
-        return objectMapper.convertValue(response.getBody(), TransactionResponse.class);
+        try {
+            var response = restClientService.post(
+                    transactionServiceUrl,
+                    TransactionServiceConstants.METHOD_DEPOSIT_MONEY,
+                    request,
+                    new ParameterizedTypeReference<>() {}
+            );
+            return objectMapper.convertValue(response.getBody(), TransactionResponse.class);
+        } catch (HttpStatusCodeException e) {
+            throw handleHttpStatusCodeException(e, FailedTransactionResponse.class);
+        }
     }
 
     public OnlinePaymentResponse makeOnlinePayment(OnlinePaymentRequest request) {
-        var response = restClientService.post(
-                transactionServiceUrl,
-                TransactionServiceConstants.METHOD_MAKE_ONLINE_PAYMENT,
-                request,
-                new ParameterizedTypeReference<>() {}
-        );
-
-        validateOnlinePaymentResponseStatusCode(response);
-        return objectMapper.convertValue(response.getBody(), OnlinePaymentResponse.class);
-    }
-
-    private void validateTransactionResponseStatusCode(ResponseEntity<Object> response) {
-        HttpStatus httpStatus = HttpStatus.valueOf(response.getStatusCode().value());
-
-        if (response.getStatusCode().isSameCodeAs(HttpStatus.UNPROCESSABLE_ENTITY)) {
-            var failedResponse = objectMapper.convertValue(response.getBody(), FailedTransactionResponse.class);
-            throw new TransactionServiceClientException(httpStatus, failedResponse);
-        }
-        if (response.getStatusCode().isSameCodeAs(HttpStatus.BAD_REQUEST)) {
-            throw new TransactionServiceClientException(httpStatus);
+        try {
+            var response = restClientService.post(
+                    transactionServiceUrl,
+                    TransactionServiceConstants.METHOD_MAKE_ONLINE_PAYMENT,
+                    request,
+                    new ParameterizedTypeReference<>() {}
+            );
+            return objectMapper.convertValue(response.getBody(), OnlinePaymentResponse.class);
+        } catch (HttpStatusCodeException e) {
+            throw handleHttpStatusCodeException(e, FailedOnlinePaymentResponse.class);
         }
     }
 
-    private void validateOnlinePaymentResponseStatusCode(ResponseEntity<Object> response) {
-        HttpStatus httpStatus = HttpStatus.valueOf(response.getStatusCode().value());
+    private <T> TransactionServiceClientException handleHttpStatusCodeException(HttpStatusCodeException e,
+                                                                                Class<T> responseType) {
+        HttpStatus httpStatus = HttpStatus.valueOf(e.getStatusCode().value());
 
-        if (response.getStatusCode().isSameCodeAs(HttpStatus.UNPROCESSABLE_ENTITY)) {
-            var failedResponse = objectMapper.convertValue(response.getBody(), FailedOnlinePaymentResponse.class);
-            throw new TransactionServiceClientException(httpStatus, failedResponse);
+        if (httpStatus.isSameCodeAs(HttpStatus.UNPROCESSABLE_ENTITY)) {
+            T responseBody = e.getResponseBodyAs(responseType);
+            return new TransactionServiceClientException(httpStatus, responseBody);
         }
-        if (response.getStatusCode().isSameCodeAs(HttpStatus.BAD_REQUEST)) {
-            throw new TransactionServiceClientException(httpStatus);
-        }
+
+        return new TransactionServiceClientException(httpStatus);
     }
 }

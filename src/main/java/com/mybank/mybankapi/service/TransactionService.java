@@ -11,13 +11,9 @@ import com.mybank.mybankapi.exception.TransactionServiceClientException;
 import com.mybank.mybankapi.integration.accountservice.AccountServiceClient;
 import com.mybank.mybankapi.integration.transactionservice.TransactionServiceClient;
 import com.mybank.mybankapi.mapper.ResponseMapper;
-import com.mybank.transactionservice.model.FailedTransactionReason;
-import com.mybank.transactionservice.model.FailedTransactionResponse;
-import com.mybank.transactionservice.model.OnlinePaymentRequest;
-import com.mybank.transactionservice.model.TransactionRequest;
+import com.mybank.transactionservice.model.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -40,7 +36,8 @@ public class TransactionService {
             throw handleAccountServiceException(request);
 
         } catch (TransactionServiceClientException e) {
-            throw handleTransactionServiceException(request, e);
+            log.error("Failed to debit money from account by IBAN: {}", request.getIban());
+            throw new TransactionException((FailedTransactionResponse) e.getFailedResponse());
         }
     }
 
@@ -55,7 +52,8 @@ public class TransactionService {
             throw handleAccountServiceException(request);
 
         } catch (TransactionServiceClientException e) {
-            throw handleTransactionServiceException(request, e);
+            log.error("Failed to deposit money for account by IBAN: {}", request.getIban());
+            throw new TransactionException((FailedTransactionResponse) e.getFailedResponse());
         }
     }
 
@@ -77,7 +75,7 @@ public class TransactionService {
         } catch (TransactionServiceClientException e) {
             log.error("Unable to make online payment from an account by iban {}", request.getTransactionInfo()
                     .getIban());
-            throw new OnlinePaymentException(e.getFailedOnlinePaymentResponse());
+            throw new OnlinePaymentException((FailedOnlinePaymentResponse) e.getFailedResponse());
         }
     }
 
@@ -100,16 +98,5 @@ public class TransactionService {
                 .build();
 
         return new TransactionException(failedResponse);
-    }
-
-    private RuntimeException handleTransactionServiceException(TransactionRequestApiModel request,
-                                                               TransactionServiceClientException e) {
-        log.error("Failed to make transaction for account by IBAN: {}", request.getIban());
-
-        if (HttpStatus.BAD_REQUEST.equals(e.getStatusCode())) {
-            return new IllegalArgumentException("Invalid request while debiting money");
-        }
-
-        return new TransactionException(e.getFailedTransactionResponse());
     }
 }
