@@ -125,6 +125,26 @@ public class ApiIntegrationTest {
     }
 
     @Test
+    void testDepositMoneyToBankAccount_status400() {
+        // negative amount
+        TransactionRequestApiModel request = TransactionRequestApiModel
+                .builder()
+                .iban("EE251298943438713614")
+                .holderName("ADAM SMITH")
+                .amount(-1.0)
+                .currencyCode(CurrencyCodeApiModel.USD)
+                .build();
+
+        given().contentType(ContentType.JSON)
+                .body(request)
+                .when()
+                .post("/transactions/deposit")
+                .then()
+                .assertThat()
+                .statusCode(400);
+    }
+
+    @Test
     void testDebitMoneyToBankAccount_status200() throws IOException, JSONException {
         String expectedResult = readString("transaction-debit-200.json");
 
@@ -166,6 +186,23 @@ public class ApiIntegrationTest {
         var actualBody = response.body();
 
         JSONAssert.assertEquals(expectedResult, actualBody.asString(), JSONCompareMode.LENIENT);
+    }
+
+    @Test
+    void testDebitMoneyToBankAccount_status400() {
+        // iban, holder name and amount are null
+        TransactionRequestApiModel request = TransactionRequestApiModel
+                .builder()
+                .currencyCode(CurrencyCodeApiModel.USD)
+                .build();
+
+        given().contentType(ContentType.JSON)
+                .body(request)
+                .when()
+                .post("/transactions/debit")
+                .then()
+                .assertThat()
+                .statusCode(400);
     }
 
     @Test
@@ -222,6 +259,32 @@ public class ApiIntegrationTest {
         var actualBody = response.body();
 
         JSONAssert.assertEquals(expectedResult, actualBody.asString(), JSONCompareMode.LENIENT);
+    }
+
+    @Test
+    void testMakeOnlinePayment_status400() {
+        // amount is less than 0.01
+        TransactionRequestApiModel transactionInfo = TransactionRequestApiModel
+                .builder()
+                .iban("EE251298943438713614")
+                .holderName("JOHN DOE")
+                .amount(0.009)
+                .currencyCode(CurrencyCodeApiModel.USD)
+                .build();
+
+        OnlinePaymentRequestApiModel request = OnlinePaymentRequestApiModel
+                .builder()
+                .transactionInfo(transactionInfo)
+                .callbackURL("https://httpstat.us/200")
+                .build();
+
+        given().contentType(ContentType.JSON)
+                .body(request)
+                .when()
+                .post("/transactions/debit")
+                .then()
+                .assertThat()
+                .statusCode(400);
     }
 
     private static String readString(String classpath) throws IOException {
