@@ -159,6 +159,7 @@ components:
         amount:
           type: number
           format: double
+          minimum: 0.01
           example: 1234.56
       required:
         - bankAccountBalanceUuid
