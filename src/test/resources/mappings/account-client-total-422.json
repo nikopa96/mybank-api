@@ -10,7 +10,7 @@
   },
   "response": {
     "status": 200,
-    "bodyFileName": "get-bank-account-total.json",
+    "bodyFileName": "account-total-200.json",
     "headers": {
       "Content-Type": "application/json"
     }

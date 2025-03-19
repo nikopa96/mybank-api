@@ -30,7 +30,7 @@ public class ApiIntegrationTest {
 
     @Test
     void testGetBankAccountTotal_status200() throws IOException, JSONException {
-        String expectedResult = readString("get-bank-account-total.json");
+        String expectedResult = readString("account-total-200.json");
 
         AccountTotalRequestApiModel request = AccountTotalRequestApiModel.builder()
                 .iban("EE251298943438713614")
@@ -47,26 +47,38 @@ public class ApiIntegrationTest {
         JSONAssert.assertEquals(expectedResult, actualBody.asString(), JSONCompareMode.LENIENT);
     }
 
-//    @Test
-//    void testGetBankAccountTotal_status422() throws IOException, JSONException {
-//        AccountTotalRequestApiModel request = AccountTotalRequestApiModel.builder()
-//                .iban("EE251298943438713615")
-//                .currencyCode(CurrencyCodeApiModel.EUR)
-//                .build();
-//
-////        var response = given().contentType(ContentType.JSON)
-////                .param()
-////                .when()
-////                .get("/accounts/balances/total");
-//
-//        given().contentType(ContentType.JSON)
-//                .body(request)
-//                .when()
-//                .post("/accounts/balances/total")
-//                .then()
-//                .assertThat()
-//                .statusCode(422);
-//    }
+    @Test
+    void testGetBankAccountTotal_status422() {
+        AccountTotalRequestApiModel request = AccountTotalRequestApiModel.builder()
+                .iban("EE251298943438713615")
+                .currencyCode(CurrencyCodeApiModel.EUR)
+                .build();
+
+        given().contentType(ContentType.JSON)
+                .body(request)
+                .when()
+                .post("/accounts/balances/total")
+                .then()
+                .assertThat()
+                .statusCode(422);
+    }
+
+    @Test
+    void testGetBankAccountTotal_status400() {
+        // incorrect iban
+        AccountTotalRequestApiModel request = AccountTotalRequestApiModel.builder()
+                .iban("298943438713615")
+                .currencyCode(CurrencyCodeApiModel.EUR)
+                .build();
+
+        given().contentType(ContentType.JSON)
+                .body(request)
+                .when()
+                .post("/accounts/balances/total")
+                .then()
+                .assertThat()
+                .statusCode(400);
+    }
 
     @Test
     void testDepositMoneyToBankAccount_status200() throws IOException, JSONException {
