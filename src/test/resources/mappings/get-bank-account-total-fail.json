@@ -1,0 +1,17 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "/accounts/balances/total",
+    "bodyPatterns" : [
+      {
+        "equalToJson" : "{\"iban\": \"EE251298943438713615\",\"currencyCode\": \"EUR\"}"
+      }
+    ]
+  },
+  "response": {
+    "status": 422,
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

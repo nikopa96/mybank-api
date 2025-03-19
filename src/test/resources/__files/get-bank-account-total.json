@@ -1,0 +1,18 @@
+{
+  "account": {
+    "iban": "EE251298943438713614",
+    "holderName": "ADAM SMITH"
+  },
+  "balances": [
+    {
+      "currencyCode": "EUR",
+      "balance": 1234.56,
+      "convertedBalanceCurrencyCode": "EUR",
+      "convertedBalance": 1234.56
+    }
+  ],
+  "total": {
+    "currencyCode": "EUR",
+    "balanceTotal": 1234.56
+  }
+}

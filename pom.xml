@@ -87,6 +87,12 @@
             <artifactId>wiremock-spring-boot</artifactId>
             <version>3.6.0</version>
         </dependency>
+        <dependency>
+            <groupId>io.rest-assured</groupId>
+            <artifactId>rest-assured</artifactId>
+            <scope>test</scope>
+            <version>5.4.0</version>
+        </dependency>
     </dependencies>
 
     <build>
