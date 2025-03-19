@@ -70,7 +70,12 @@ public class TransactionService {
             return responseMapper.toApiModel(depositClientResponse);
 
         } catch (AccountServiceClientException e) {
-            throw handleAccountServiceException(request.getTransactionInfo());
+            log.error("Account not found by IBAN: {}", request.getTransactionInfo().getIban());
+            var failedResponse = FailedOnlinePaymentResponse.builder()
+                    .failureReason(FailedOnlinePaymentReason.ACCOUNT_BALANCE_NOT_FOUND)
+                    .success(false)
+                    .build();
+            throw new OnlinePaymentException(failedResponse);
 
         } catch (TransactionServiceClientException e) {
             log.error("Unable to make online payment from an account by iban {}", request.getTransactionInfo()
