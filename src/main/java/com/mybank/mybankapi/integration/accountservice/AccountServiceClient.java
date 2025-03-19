@@ -5,7 +5,7 @@ import com.mybank.accountservice.model.AccountBalanceProperties;
 import com.mybank.accountservice.model.AccountTotalRequest;
 import com.mybank.accountservice.model.AccountTotalResponse;
 import com.mybank.accountservice.model.CurrencyCode;
-import com.mybank.mybankapi.exception.ClientIntegrationException;
+import com.mybank.mybankapi.exception.AccountServiceClientException;
 import com.mybank.mybankapi.integration.RestClientService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -55,11 +55,9 @@ public class AccountServiceClient {
     }
 
     private static void validateResponseStatusCode(ResponseEntity<Object> response) {
-        if (!response.getStatusCode().is2xxSuccessful()) {
+        if (response.getStatusCode().is4xxClientError()) {
             HttpStatus httpStatus = HttpStatus.valueOf(response.getStatusCode().value());
-            String message = "Unable to get response. Status: " + response.getStatusCode();
-
-            throw new ClientIntegrationException(message, httpStatus);
+            throw new AccountServiceClientException(httpStatus);
         }
     }
 }

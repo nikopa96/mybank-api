@@ -1,12 +1,9 @@
 package com.mybank.mybankapi.integration.transactionservice;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mybank.mybankapi.exception.ClientIntegrationException;
+import com.mybank.mybankapi.exception.TransactionServiceClientException;
 import com.mybank.mybankapi.integration.RestClientService;
-import com.mybank.transactionservice.model.OnlinePaymentRequest;
-import com.mybank.transactionservice.model.OnlinePaymentResponse;
-import com.mybank.transactionservice.model.TransactionRequest;
-import com.mybank.transactionservice.model.TransactionResponse;
+import com.mybank.transactionservice.model.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -32,10 +29,7 @@ public class TransactionServiceClient {
                 new ParameterizedTypeReference<>() {}
         );
 
-        String errorMessage = String.format("Unable to debit money from an bank_account_balance: %s",
-                request.getBankAccountBalanceUuid());
-        validateResponseStatusCode(response, errorMessage);
-
+        validateTransactionResponseStatusCode(response);
         return objectMapper.convertValue(response.getBody(), TransactionResponse.class);
     }
 
@@ -47,10 +41,7 @@ public class TransactionServiceClient {
                 new ParameterizedTypeReference<>() {}
         );
 
-        String errorMessage = String.format("Unable to deposit money to an bank_account_balance: %s",
-                request.getBankAccountBalanceUuid());
-        validateResponseStatusCode(response, errorMessage);
-
+        validateTransactionResponseStatusCode(response);
         return objectMapper.convertValue(response.getBody(), TransactionResponse.class);
     }
 
@@ -62,17 +53,31 @@ public class TransactionServiceClient {
                 new ParameterizedTypeReference<>() {}
         );
 
-        String errorMessage = String.format("Unable to deposit money to an bank_account_balance: %s",
-                request.getTransactionInfo().getBankAccountBalanceUuid());
-        validateResponseStatusCode(response, errorMessage);
-
+        validateOnlinePaymentResponseStatusCode(response);
         return objectMapper.convertValue(response.getBody(), OnlinePaymentResponse.class);
     }
 
-    private static void validateResponseStatusCode(ResponseEntity<Object> response, String errorMessage) {
-        if (!response.getStatusCode().is2xxSuccessful()) {
-            HttpStatus httpStatus = HttpStatus.valueOf(response.getStatusCode().value());
-            throw new ClientIntegrationException(errorMessage, httpStatus);
+    private void validateTransactionResponseStatusCode(ResponseEntity<Object> response) {
+        HttpStatus httpStatus = HttpStatus.valueOf(response.getStatusCode().value());
+
+        if (response.getStatusCode().isSameCodeAs(HttpStatus.UNPROCESSABLE_ENTITY)) {
+            var failedResponse = objectMapper.convertValue(response.getBody(), FailedTransactionResponse.class);
+            throw new TransactionServiceClientException(httpStatus, failedResponse);
+        }
+        if (response.getStatusCode().isSameCodeAs(HttpStatus.BAD_REQUEST)) {
+            throw new TransactionServiceClientException(httpStatus);
+        }
+    }
+
+    private void validateOnlinePaymentResponseStatusCode(ResponseEntity<Object> response) {
+        HttpStatus httpStatus = HttpStatus.valueOf(response.getStatusCode().value());
+
+        if (response.getStatusCode().isSameCodeAs(HttpStatus.UNPROCESSABLE_ENTITY)) {
+            var failedResponse = objectMapper.convertValue(response.getBody(), FailedOnlinePaymentResponse.class);
+            throw new TransactionServiceClientException(httpStatus, failedResponse);
+        }
+        if (response.getStatusCode().isSameCodeAs(HttpStatus.BAD_REQUEST)) {
+            throw new TransactionServiceClientException(httpStatus);
         }
     }
 }
