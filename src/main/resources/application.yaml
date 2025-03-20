@@ -1,9 +1,25 @@
+spring:
+  config:
+    activate:
+      on-profile: local
+
+---
 server:
   port: 8080
 spring:
   application:
     name: mybank-api
-account-service:
-  url: http://localhost:8081
-transaction-service:
-  url: http://localhost:8082
+  account-service:
+    url: http://localhost:8081
+  transaction-service:
+    url: http://localhost:8082
+
+---
+spring:
+  config:
+    activate:
+      on-profile: docker
+  account-service:
+    url: http://account-service:8080
+  transaction-service:
+    url: http://transaction-service:8080

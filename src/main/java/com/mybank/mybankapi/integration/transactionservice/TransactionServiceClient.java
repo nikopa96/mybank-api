@@ -18,7 +18,7 @@ public class TransactionServiceClient {
     private final RestClientService restClientService;
     private final ObjectMapper objectMapper;
 
-    @Value("${transaction-service.url}")
+    @Value("${spring.transaction-service.url}")
     private String transactionServiceUrl;
 
     public TransactionResponse debitMoneyFromBankAccount(TransactionRequest request) {

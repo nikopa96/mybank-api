@@ -23,7 +23,7 @@ public class AccountServiceClient {
     private final RestClientService restClientService;
     private final ObjectMapper objectMapper;
 
-    @Value("${account-service.url}")
+    @Value("${spring.account-service.url}")
     private String accountServiceUrl;
 
     public AccountBalanceProperties getAccountBalanceProperties(String iban, String currency) {
