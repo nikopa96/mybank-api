@@ -66,7 +66,15 @@ Clone the following projects to your local machine:
 This project uses OpenAPI Generator to generate DTO and Controller classes. If they are highlighted in "red" in your code, then go to the target/generated-sources folder and mark this folder as "generated source". [See screenshot](./readme_resources/project_structure_help.png)
 
 ## API & Endpoints
-**IMPORTANT!** You can find IBAN and holder names in the **"bank_account"** database table. The amount of money in a specific currency can be found in the **"bank_account_balance"** table. **You can use this database data to test the following endpoints**. These data are also shown in the  **src/main/resources/import-sample-data.yaml** file.
+We have 2 clients in the database: 
+| Holder name      | IBAN                  |
+|------------------|-----------------------|
+| ADAM SMITH       | EE511287154215965472  |
+| BEST COMPANY AS  | EE951266739722198152  |
+
+Copy their Holder name (in capital letters) and IBAN to get information from the following endpoints:
+
+You can find IBAN and holder names in the **"bank_account"** database table. The amount of money in a specific currency can be found in the **"bank_account_balance"** table. All preinserted data in the [**import-sample-data.yaml**](https://github.com/nikopa96/account-service/blob/master/src/main/resources/db/changelog/insert-sample-data.yaml) file.
 
 ### Get Account Balance with a currency exchange
 ```POST /accounts/balances/total```
