@@ -93,46 +93,76 @@ Example of request:
 
 Both parameters are required.
 
+If the client does not have a balance in the requested currency, then bodyless 422 Unprocessable entity response will be returned.
+
 ### Add Money to Account
 ```POST /transactions/deposit```
 
-Depositing money into an account in a specific currency. If the client does not have a balance in the requested currency, the money will not be added and the backend will return 422 Unprocessable Entity with the corresponding response body.
+Depositing money into an account in a specific currency. If the client does not have a balance in the requested currency or this account does not exist, the money will not be added and the backend will return 422 Unprocessable Entity with the corresponding response body.
 
 Example of request:
 ```json
 {
-    "iban": "EE251298943438713614",
+    "iban": "EE511287154215965472",
     "holderName": "ADAM SMITH",
     "amount": 123.45,
     "currencyCode": "USD"
 }
 ```
-All parameters in the request are required. Otherwise, the API returns 400 Bad Request. If the client with the same ```iban``` and ```holderName``` does not exist, then the API returns 422 Unprocessable Entity with the corresponding response body.
+Positive response 200 OK:
+```json
+{
+    "type": "DEPOSIT",
+    "success": true
+}
+```
+Negative response 422 Unprocessable entity:
+```json
+{
+    "type": "ACCOUNT_BALANCE_NOT_FOUND",
+    "success": false
+}
+```
+All parameters in the request are required. Otherwise, the API returns 400 Bad Request.
 
 ### Debit Money from Account
 ```POST /transactions/debit```
 
-Debiting money from an account in a specific currency. If the client does not have a balance in the requested currency, the money will not be debited and the backend will return 422 Unprocessable Entity with the corresponding response body.
+Debiting money from an account in a specific currency. If the client does not have a balance in the requested currency or this account does not exist, the money will not be debited and the backend will return 422 Unprocessable Entity with the corresponding response body.
 
 If the client has an account in a specific currency but does not have enough money funds, then a 422 Unprocessable Entity is returned with the corresponding response body.
 
 Example of request:
 ```json
 {
-    "iban": "EE251298943438713614",
+    "iban": "EE511287154215965472",
     "holderName": "ADAM SMITH",
     "amount": 567.89,
     "currencyCode": "EUR"
 }
 ```
-All parameters in the request are required. Otherwise, the API returns 400 Bad Request. If the client with the same ```iban``` and ```holderName``` does not exist, then the API returns 422 Unprocessable Entity with the corresponding response body.
+Positive response 200 OK:
+```json
+{
+    "type": "DEBIT",
+    "success": true
+}
+```
+Negative response 422 Unprocessable entity:
+```json
+{
+    "type": "NOT_ENOUGH_MONEY",
+    "success": false
+}
+```
+All parameters in the request are required. Otherwise, the API returns 400 Bad Request.
 
 ### Make online payment
 ```POST /transactions/onlinepayment```
 
 This endpoint simulates communication with external payment gateway services like Shopify etc. We use https://httpstat.us/ website to simulate callbacks.
 
-If the client does not have a balance in the requested currency, the money will not be debited and the backend will return 422 Unprocessable Entity with the corresponding response body.
+If the client does not have a balance in the requested currency or this account does not exist, the money will not be debited and the backend will return 422 Unprocessable Entity with the corresponding response body.
 
 If the client has an account in a specific currency but does not have enough money funds, then a 422 Unprocessable Entity is returned with the corresponding response body.
 
@@ -140,7 +170,7 @@ Example of request:
 ```json
 {
   "transactionInfo": {
-    "iban": "EE251298943438713614",
+    "iban": "EE511287154215965472",
     "holderName": "ADAM SMITH",
     "amount": 567.89,
     "currencyCode": "EUR"
@@ -148,6 +178,20 @@ Example of request:
   "callbackURL": "https://httpstat.us/200"
 }
 ```
-All parameters in the request are required. Otherwise, the API returns 400 Bad Request. If the client with the same ```iban``` and ```holderName``` does not exist, then the API returns 422 Unprocessable Entity with the corresponding response body.
+Positive response 200 OK:
+```json
+{
+    "type": "DEBIT",
+    "success": true
+}
+```
+Negative response 422 Unprocessable entity:
+```json
+{
+    "type": "NO_RESPONSE_FROM_PAYMENT_GATEWAY_SERVER",
+    "success": false
+}
+```
+All parameters in the request are required. Otherwise, the API returns 400 Bad Request.
 
 If the external gateway service is temporarily unavailable, then we also return 422 status code with a response.
