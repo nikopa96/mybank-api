@@ -134,6 +134,7 @@ components:
         - USD
         - SEK
         - RUB
+      example: EUR
     TransactionType:
       type: string
       enum:
@@ -144,12 +145,14 @@ components:
       enum:
         - NOT_ENOUGH_MONEY
         - ACCOUNT_BALANCE_NOT_FOUND
+      example: ACCOUNT_BALANCE_NOT_FOUND
     FailedOnlinePaymentReason:
       type: string
       enum:
         - NOT_ENOUGH_MONEY
         - ACCOUNT_BALANCE_NOT_FOUND
         - NO_RESPONSE_FROM_PAYMENT_GATEWAY_SERVER
+      example: NO_RESPONSE_FROM_PAYMENT_GATEWAY_SERVER
     TransactionRequest:
       type: object
       properties:
@@ -187,7 +190,7 @@ components:
           $ref: '#/components/schemas/TransactionRequest'
         callbackURL:
           type: string
-          example: uri
+          example: https://httpstat.us/200
       required:
         - transactionInfo
         - callbackURL
