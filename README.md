@@ -3,8 +3,10 @@ A project with a microservice architecture for working with bank multi-currency 
 
 - [Stack of technologies](#stack-of-technologies)
 - [Architecture](#architecture)
+- [Database](#database)
 - [Running a project on a local machine](#running-a-project-on-a-local-machine)
 - [API & Endpoints](#api--endpoints)
+- [Testing](#testing)
 
 
 ## Stack of technologies
@@ -195,3 +197,7 @@ Negative response 422 Unprocessable entity:
 All parameters in the request are required. Otherwise, the API returns 400 Bad Request.
 
 If the external gateway service is temporarily unavailable, then we also return 422 status code with a response.
+
+## Testing
+### Integration tests
+Integration tests have been written for this project using Wiremock and RestAssured. You can find integration tests in the integration/ApiIntegrationTest.java file. In the resources/mappings folder, you can find JSON files: they mock requests and responses of the AccountService and TransactionService
