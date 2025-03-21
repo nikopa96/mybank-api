@@ -202,4 +202,7 @@ If the external gateway service is temporarily unavailable, then we also return 
 
 ## Testing
 ### Integration tests
-Integration tests have been written for this project using Wiremock and RestAssured. You can find integration tests in the integration/ApiIntegrationTest.java file. In the resources/mappings folder, you can find JSON files: they mock requests and responses of the AccountService and TransactionService
+Integration tests have been written for this project using Wiremock and RestAssured. You can find integration tests in the integration/ApiIntegrationTest.java file in the MyBankAPI project. In the resources/mappings folder, you can find JSON files: they mock requests and responses of the AccountService and TransactionService
+
+### Unit tests
+Unit tests for service classes for MyBankAPI and AccountService are also written. However, tests were not written for the TransactionService project due to a lack of time. Nice to have: unit tests for controllers and mapper classes.
