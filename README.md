@@ -90,8 +90,8 @@ Returns balances in all currencies of the client's multi-currency bank account. 
 Example of request:
 ```json
 {
-    "iban": "EE251298943438713614",
-    "currencyCode": "USD"
+    "iban": "EE511287154215965472",
+    "currencyCode": "EUR"
 }
 ```
 ```iban``` is a search criterion to find the account balance.
