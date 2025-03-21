@@ -65,6 +65,8 @@ Clone the following projects to your local machine:
 5. If you cannot run project by Lombok issues, then go to the IntelliJ Annotation Processors Settings and enable "Obtain processors from project classpath". After that, make mvn clean package again and run the project
 6. Open the page in your browser: [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html). On this page you can use all public endpoints of the project.
 
+You also can run the project using a Maven plugin of the Spring Boot: ```mvn spring-boot:run```
+
 **IMPORTANT!** This project uses Lombok, so "Enable annotation processing" must be enabled. In the IntelliJ Annotation Processors menu "Obtain processors from project classpath" must be checked for each microservice. [See screenshot](./readme_resources/annotation_processors_help.png)
 
 This project uses OpenAPI Generator to generate DTO and Controller classes. If they are highlighted in "red" in your code, then go to the target/generated-sources folder and mark this folder as "generated source". [See screenshot](./readme_resources/project_structure_help.png)
